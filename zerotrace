@@ -1,0 +1,73 @@
+#!/bin/bash
+
+GREEN="\033[0;32m"
+RED="\033[0;31m"
+YELLOW="\033[1;33m"
+RESET="\033[0m"
+
+clear
+
+banner() {
+  echo -e "${YELLOW}"
+  echo "┌─────────────────────────────┐"
+  echo "│       ZERO-TRACE v1.1       │"
+  echo "└─────────────────────────────┘"
+  echo -e "${RESET}"
+}
+
+encrypt_message() {
+  echo -e "${GREEN}\n[+] Encryption Mode${RESET}"
+  read -p "Enter your message: " message
+  read -sp "Enter password: " pass
+  echo
+  encrypted=$(echo "$message" | openssl enc -aes-256-cbc -a -pbkdf2 -iter 100000 -pass pass:"$pass")
+  echo -e "\n${GREEN}Encrypted Output:${RESET}"
+  echo "$encrypted"
+  
+  echo -e "\n${YELLOW}Do you want to save it to a file? (y/n)${RESET}"
+  read -n1 save_choice
+  echo
+  if [[ "$save_choice" == "y" || "$save_choice" == "Y" ]]; then
+    timestamp=$(date +%Y%m%d_%H%M%S)
+    filename="zero_encrypted_$timestamp.txt"
+    echo "$encrypted" > "$filename"
+    echo -e "${GREEN}Saved to $filename${RESET}"
+  fi
+}
+
+decrypt_message() {
+  echo -e "${GREEN}\n[+] Decryption Mode${RESET}"
+  read -p "Enter encrypted message: " encrypted
+  read -sp "Enter password: " pass
+  echo
+  decrypted=$(echo "$encrypted" | openssl enc -aes-256-cbc -d -a -pbkdf2 -iter 100000 -pass pass:"$pass" 2>/dev/null)
+
+  if [ $? -ne 0 ]; then
+    echo -e "\n${RED}❌ Decryption failed. Wrong password or invalid data.${RESET}"
+  else
+    echo -e "\n${GREEN}Decrypted Message (self-destructing in 7 sec):${RESET} $decrypted"
+    sleep 7
+    clear
+    banner
+  fi
+}
+
+while true; do
+  clear
+  banner
+  echo -e "${GREEN}Choose:${RESET}"
+  echo -e "  [e] Encrypt"
+  echo -e "  [d] Decrypt"
+  echo -e "  [q] Quit"
+  echo -ne "\n${YELLOW}>> ${RESET}"
+  read choice
+
+  case "$choice" in
+    e|E) encrypt_message ;;
+    d|D) decrypt_message ;;
+    q|Q) echo -e "${RED}Exiting Zero-Trace. Stay ghost, My Liege.${RESET}"; break ;;
+    *) echo -e "${RED}Invalid option.${RESET}"; sleep 1 ;;
+  esac
+  echo -e "\nPress Enter to continue..."
+  read
+done

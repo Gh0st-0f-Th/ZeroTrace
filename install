@@ -1,0 +1,22 @@
+#!/bin/bash
+
+GREEN="\033[0;32m"
+RED="\033[0;31m"
+RESET="\033[0m"
+
+SCRIPT="zerotrace"
+INSTALL_PATH="$PREFIX/bin/$SCRIPT"
+
+# Check if the script exists in the current directory
+if [[ ! -f "./$SCRIPT" ]]; then
+  echo -e "${RED}[!] Cannot find '$SCRIPT' in $(pwd)${RESET}"
+  exit 1
+fi
+
+echo -e "${GREEN}[*] Installing ZeroTrace...${RESET}"
+
+# Copy and make executable
+cp "$SCRIPT" "$INSTALL_PATH"
+chmod +x "$INSTALL_PATH"
+
+echo -e "${GREEN}[✓] Installed successfully! You can now run it using: zerotrace${RESET}"
