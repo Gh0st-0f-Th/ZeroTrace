@@ -1,22 +1,36 @@
 #!/bin/bash
 
+YELLOW="\033[1;33m"
 GREEN="\033[0;32m"
 RED="\033[0;31m"
 RESET="\033[0m"
 
-SCRIPT="zerotrace"
-INSTALL_PATH="$PREFIX/bin/$SCRIPT"
+echo -e "${YELLOW}[+] Installing ZeroTrace...${RESET}"
 
-# Check if the script exists in the current directory
-if [[ ! -f "./$SCRIPT" ]]; then
-  echo -e "${RED}[!] Cannot find '$SCRIPT' in $(pwd)${RESET}"
-  exit 1
+# Detect if OpenSSL is available
+if ! command -v openssl &>/dev/null; then
+  echo -e "${RED}[!] OpenSSL not found.${RESET}"
+
+  # Detect Termux
+  if [[ "$PREFIX" == *"com.termux"* ]]; then
+    echo -e "${YELLOW}[i] Detected Termux. Installing OpenSSL...${RESET}"
+    pkg update -y && pkg install -y openssl-tool
+  elif command -v apt &>/dev/null; then
+    echo -e "${YELLOW}[i] Detected APT-compatible system. Installing OpenSSL...${RESET}"
+    sudo apt update && sudo apt install -y openssl
+  else
+    echo -e "${RED}[✗] Could not detect your package manager. Please install OpenSSL manually.${RESET}"
+    exit 1
+  fi
 fi
 
-echo -e "${GREEN}[*] Installing ZeroTrace...${RESET}"
-
-# Copy and make executable
-cp "$SCRIPT" "$INSTALL_PATH"
-chmod +x "$INSTALL_PATH"
-
-echo -e "${GREEN}[✓] Installed successfully! You can now run it using: zerotrace${RESET}"
+# Install ZeroTrace
+DEST="$PREFIX/bin/zerotrace"
+if cp zerotrace "$DEST"; then
+  chmod +x "$DEST"
+  echo -e "${GREEN}[✓] ZeroTrace installed to $DEST${RESET}"
+  echo -e "${GREEN}[✓] You can now run it by typing: zerotrace${RESET}"
+else
+  echo -e "${RED}[✗] Failed to install. Are you in the right directory?${RESET}"
+  exit 1
+fi
