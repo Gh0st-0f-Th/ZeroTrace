@@ -15,7 +15,7 @@ No dependencies, no fluff — just clean encryption with self-destruct capabilit
 ## 🛠 Installation
 
 ```bash
-git clone https://github.com/yourusername/ZeroTrace.git
+git clone https://github.com/Gh0st-0f-Th/ZeroTrace.git
 cd ZeroTrace
 chmod +x install
 ./install
