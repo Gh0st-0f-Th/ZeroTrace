@@ -23,16 +23,6 @@ encrypt_message() {
   encrypted=$(echo "$message" | openssl enc -aes-256-cbc -a -pbkdf2 -iter 100000 -pass pass:"$pass")
   echo -e "\n${GREEN}Encrypted Output:${RESET}"
   echo "$encrypted"
-  
-  echo -e "\n${YELLOW}Do you want to save it to a file? (y/n)${RESET}"
-  read -n1 save_choice
-  echo
-  if [[ "$save_choice" == "y" || "$save_choice" == "Y" ]]; then
-    timestamp=$(date +%Y%m%d_%H%M%S)
-    filename="zero_encrypted_$timestamp.txt"
-    echo "$encrypted" > "$filename"
-    echo -e "${GREEN}Saved to $filename${RESET}"
-  fi
 }
 
 decrypt_message() {
